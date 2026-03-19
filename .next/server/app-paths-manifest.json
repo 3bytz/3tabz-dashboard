@@ -1,0 +1,13 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/health/page": "app/health/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/content/page": "app/content/page.js",
+  "/page": "app/page.js",
+  "/notifications/page": "app/notifications/page.js",
+  "/users/[id]/page": "app/users/[id]/page.js",
+  "/users/page": "app/users/page.js",
+  "/subscriptions/page": "app/subscriptions/page.js",
+  "/ai-usage/page": "app/ai-usage/page.js",
+  "/login/page": "app/login/page.js"
+}
