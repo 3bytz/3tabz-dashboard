@@ -14,11 +14,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="w-full flex h-screen overflow-hidden bg-[#0a0a0a]">
+      <body className="bg-[#0a0a0a]">
         <ToastProvider>
-          <LayoutShell>
-            {children}
-          </LayoutShell>
+          <div className="flex h-screen w-full overflow-hidden">
+            <LayoutShell>
+              {children}
+            </LayoutShell>
+          </div>
         </ToastProvider>
       </body>
     </html>
