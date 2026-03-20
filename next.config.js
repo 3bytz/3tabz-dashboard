@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://api.3tabz.app/v1'}/:path*`,
+        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://api.3tabz.com/v1'}/:path*`,
       },
     ]
   },

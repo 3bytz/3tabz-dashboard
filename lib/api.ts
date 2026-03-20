@@ -110,7 +110,7 @@ async function req<T>(
     ...(fetchOptions.headers as Record<string, string> | undefined),
   }
 
-  // Use partialToken for TOTP step, otherwise use stored admin_token cookie
+  // For TOTP step 2 use partialToken, otherwise read stored admin_token cookie
   const token = partialToken ?? getAdminToken()
   if (token) headers['Authorization'] = `Bearer ${token}`
 

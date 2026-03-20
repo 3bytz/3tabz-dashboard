@@ -28,8 +28,7 @@ export default function LoginPage() {
           setPartialToken(res.partialToken);
           setShowTotp(true);
         } else if (res?.accessToken) {
-          // Save the JWT as a cookie so middleware can read it
-          const expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString() // 8h
+          const expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString()
           document.cookie = `admin_token=${res.accessToken}; expires=${expires}; path=/; SameSite=Lax`
           router.push("/");
         }

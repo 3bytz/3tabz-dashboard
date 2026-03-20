@@ -61,20 +61,27 @@ export default function NotificationsPage() {
 
   useEffect(() => { loadHistory() }, [loadHistory])
 
-  // Undo countdown
+  // Undo countdown — only fires the broadcast when countdown reaches 0
+  // after being started (not on initial mount when undoSecs is already 0)
   useEffect(() => {
     if (undoSecs <= 0) {
-      if (undoRef.current) clearInterval(undoRef.current)
-      // Fire the real API call when countdown reaches 0 (and there's a pending broadcast)
-      if (undoSecs === 0 && pendingBcast) {
-        commitBroadcast(pendingBcast)
+      if (undoRef.current) {
+        clearInterval(undoRef.current)
+        undoRef.current = null
+        // Only commit if countdown was actively running (ref was set)
+        // pendingBcast check ensures we don't fire on initial mount
+        if (pendingBcast) {
+          commitBroadcast(pendingBcast)
+        }
       }
       return
     }
     undoRef.current = setInterval(() => setUndoSecs(s => s - 1), 1000)
-    return () => { if (undoRef.current) clearInterval(undoRef.current) }
+    return () => {
+      if (undoRef.current) clearInterval(undoRef.current)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [undoSecs > 0])
+  }, [undoSecs])
 
   async function commitBroadcast(optimistic: Broadcast) {
     if (!pendingBcast) return
