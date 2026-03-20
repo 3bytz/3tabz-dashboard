@@ -41,8 +41,9 @@ export default function SettingsPage() {
   const [savingCrons, setSavingCrons] = useState(false)
   const [actionId,    setActionId]    = useState<string | null>(null)
 
-  const [inviteEmail,  setInviteEmail]  = useState('')
-  const [inviteRole,   setInviteRole]   = useState('admin')
+  const [inviteEmail,    setInviteEmail]    = useState('')
+  const [inviteFullName, setInviteFullName] = useState('')
+  const [inviteRole,     setInviteRole]     = useState('admin')
   const [inviting,     setInviting]     = useState(false)
   const [revokeTarget, setRevokeTarget] = useState<AdminUser | null>(null)
   const [newIp,        setNewIp]        = useState('')
@@ -133,12 +134,13 @@ export default function SettingsPage() {
   }
 
   const handleInvite = async () => {
-    if (!inviteEmail.trim()) return
+    if (!inviteEmail.trim() || !inviteFullName.trim()) return
     setInviting(true)
     try {
-      const newAdmin = await api.inviteAdmin(inviteEmail, inviteRole)
+      const newAdmin = await api.inviteAdmin(inviteEmail, inviteFullName, inviteRole)
       setAdmins(a => [...a, newAdmin])
       setInviteEmail('')
+      setInviteFullName('')
       success(`Invite sent to ${inviteEmail}`)
     } catch (e: any) {
       toastError(e?.message ?? 'Failed to send invite')
@@ -275,7 +277,20 @@ export default function SettingsPage() {
               ))}
             </div>
             <div className="flex gap-2">
-              <Input placeholder="new-admin@3tabz.app" value={inviteEmail} onChange={setInviteEmail} className="flex-1" />
+              <div className="flex flex-col gap-2 flex-1">
+                <Input
+                  placeholder="Full name (e.g. Jane Smith)"
+                  value={inviteFullName}
+                  onChange={setInviteFullName}
+                  className="w-full"
+                />
+                <Input
+                  placeholder="admin@3tabz.com"
+                  value={inviteEmail}
+                  onChange={setInviteEmail}
+                  className="w-full"
+                />
+              </div>
               <Select value={inviteRole} onChange={setInviteRole} options={[
                 { value: 'super_admin', label: 'Super Admin' },
                 { value: 'admin',       label: 'Admin'       },

@@ -7,7 +7,7 @@ import { api } from '@/lib/api'
 import type { Broadcast } from '@/lib/api'
 
 type Target  = 'all' | 'free' | 'pro'
-type MsgType = 'general' | 'event' | 'holiday' | 'health_tip' | 'feature'
+type MsgType = 'general' | 'event' | 'holiday' | 'health_tip' | 'feature_announcement'
 type Template = { id: string; name: string; title: string; body: string; type: string }
 
 const SEED_TEMPLATES: Template[] = [
@@ -22,7 +22,7 @@ const targetLabels: Record<Target, string> = {
   pro:  'Pro users only',
 }
 const typeColors: Record<string, string> = {
-  general: 'gray', event: 'yellow', holiday: 'accent', health_tip: 'green', feature: 'green',
+  general: 'gray', event: 'yellow', holiday: 'accent', health_tip: 'green', feature_announcement: 'green',
 }
 
 export default function NotificationsPage() {
@@ -206,7 +206,7 @@ export default function NotificationsPage() {
             <div className="space-y-1">
               <label className="text-xs text-[#525252]">Type</label>
               <Select value={type} onChange={v => setType(v as MsgType)} options={[
-                { value: 'general', label: 'General' }, { value: 'feature', label: 'Feature' },
+                { value: 'general', label: 'General' }, { value: 'feature_announcement', label: 'Feature' },
                 { value: 'health_tip', label: 'Health tip' }, { value: 'event', label: 'Event' }, { value: 'holiday', label: 'Holiday' },
               ]} className="w-full" />
             </div>

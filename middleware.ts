@@ -2,17 +2,21 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const isLoginPage = request.nextUrl.pathname === '/login'
+  const pathname    = request.nextUrl.pathname
+  const isLoginPage = pathname === '/login'
+  const isSetupPage = pathname.startsWith('/setup')
   const token       = request.cookies.get('admin_token')?.value
 
-  // No token and not on login → redirect to login
-  if (!token && !isLoginPage) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  if (isLoginPage || isSetupPage) {
+    if (token && isLoginPage) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    return NextResponse.next()
   }
 
-  // Has token and trying to access login → redirect to dashboard
-  if (token && isLoginPage) {
-    return NextResponse.redirect(new URL('/', request.url))
+  // All other pages require the admin_token cookie
+  if (!token) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   return NextResponse.next()

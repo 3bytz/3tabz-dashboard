@@ -164,6 +164,20 @@ export const api = {
   adminLogout: () =>
     req('/admin/auth/logout', { method: 'POST' }),
 
+  // Called from /setup page — public endpoint, uses invite token not JWT
+  setupAccount: (inviteToken: string, password: string) =>
+    fetch(`${BASE}/admin/auth/setup-account`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inviteToken, password }),
+    }).then(async res => {
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.message ?? body?.error ?? 'Setup failed')
+      }
+      return res.json()
+    }),
+
   // ── Overview ──────────────────────────────────────────────────
   getOverviewStats:    () => req<OverviewStats>('/admin/stats/overview'),
   getSignupsByDay:     () => req<SignupDay[]>('/admin/stats/signups-by-day'),
@@ -243,8 +257,8 @@ export const api = {
 
   // /admin/settings/admins — matches new backend paths
   getAdmins:   () => req<AdminUser[]>('/admin/settings/admins'),
-  inviteAdmin: (email: string, role: string) =>
-    req<AdminUser>('/admin/settings/admins/invite', { method: 'POST', body: JSON.stringify({ email, fullName: email.split('@')[0], role }) }),
+  inviteAdmin: (email: string, fullName: string, role: string) =>
+    req<AdminUser>('/admin/settings/admins/invite', { method: 'POST', body: JSON.stringify({ email, fullName, role }) }),
   revokeAdmin: (id: string) =>
     req<void>(`/admin/settings/admins/${id}`, { method: 'DELETE' }),
 }
