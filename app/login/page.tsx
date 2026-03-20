@@ -28,6 +28,9 @@ export default function LoginPage() {
           setPartialToken(res.partialToken);
           setShowTotp(true);
         } else if (res?.accessToken) {
+          // Save the JWT as a cookie so middleware can read it
+          const expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString() // 8h
+          document.cookie = `admin_token=${res.accessToken}; expires=${expires}; path=/; SameSite=Lax`
           router.push("/");
         }
       } catch (e: any) {
@@ -57,7 +60,11 @@ export default function LoginPage() {
     }
     setLoading(true);
     try {
-      await api.adminLogin(email, password, totp, partialToken);
+      const totpRes = (await api.adminLogin(email, password, totp, partialToken)) as any;
+      if (totpRes?.accessToken) {
+        const expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString()
+        document.cookie = `admin_token=${totpRes.accessToken}; expires=${expires}; path=/; SameSite=Lax`
+      }
       router.push("/");
     } catch (e: any) {
       const msg = e?.message ?? "";

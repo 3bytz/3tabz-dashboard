@@ -1,5 +1,12 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.com/v1'
 
+// ── Read admin_token cookie (client-side only) ───────────────────
+function getAdminToken(): string | null {
+  if (typeof document === 'undefined') return null  // SSR guard
+  const match = document.cookie.match(/(?:^|;\s*)admin_token=([^;]*)/)
+  return match ? decodeURIComponent(match[1]) : null
+}
+
 // ── Error type ──────────────────────────────────────────────────
 export interface ApiError extends Error { status: number; code?: string }
 
@@ -103,7 +110,9 @@ async function req<T>(
     ...(fetchOptions.headers as Record<string, string> | undefined),
   }
 
-  if (partialToken) headers['Authorization'] = `Bearer ${partialToken}`
+  // Use partialToken for TOTP step, otherwise use stored admin_token cookie
+  const token = partialToken ?? getAdminToken()
+  if (token) headers['Authorization'] = `Bearer ${token}`
 
   const res = await fetch(`${BASE}${path}`, {
     ...fetchOptions,
