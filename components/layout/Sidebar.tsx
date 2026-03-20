@@ -42,7 +42,7 @@ export function Sidebar() {
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center overflow-hidden shadow-lg shadow-accent/20">
               <img
-                src="/tranparent-Favicon.png"
+                src="/AppIcon.png"
                 alt="3TABZ"
                 className="h-10 w-10 object-contain"
               />

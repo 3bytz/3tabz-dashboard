@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [totp, setTotp] = useState("");
-  const [partialToken, setPartialToken] = useState(""); // held between step 1 and step 2
+  const [partialToken, setPartialToken] = useState("");
   const [showTotp, setShowTotp] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,6 @@ export default function LoginPage() {
     setError("");
 
     if (!showTotp) {
-      // ── Step 1: email + password ──────────────────────────────
       if (!email || !password) return;
       setLoading(true);
       try {
@@ -29,7 +28,6 @@ export default function LoginPage() {
           setPartialToken(res.partialToken);
           setShowTotp(true);
         } else if (res?.accessToken) {
-          // TOTP not enabled on this account — already logged in via cookie
           router.push("/");
         }
       } catch (e: any) {
@@ -53,7 +51,6 @@ export default function LoginPage() {
       return;
     }
 
-    // ── Step 2: verify TOTP ───────────────────────────────────
     if (totp.length < 6) {
       setError("Enter the 6-digit code from your authenticator app.");
       return;
@@ -92,16 +89,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
+    <div className="min-h-screen w-full bg-[#0a0a0a] flex items-center justify-center p-6">
       {/* Background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(200,241,53,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,241,53,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
 
       <div className="relative w-full max-w-sm">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-10 justify-center">
-          <div className="w-9 h-9 bg-[#C8F135] rounded flex items-center justify-center">
-            <Zap size={18} className="text-black" strokeWidth={2.5} />
-          </div>
           <span className="font-display font-bold text-2xl tracking-tight text-white">
             3TAB<span className="text-[#C8F135]">Z</span>
           </span>

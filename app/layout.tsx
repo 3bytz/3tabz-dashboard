@@ -7,14 +7,14 @@ export const metadata: Metadata = {
   title: '3TABZ Admin',
   description: '3TABZ platform administration dashboard',
   icons: {
-    icon: '/favicon2.png',
+    icon: '/AppIcon.png',
   },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="flex h-screen overflow-hidden bg-[#0a0a0a]">
+      <body className="w-full flex h-screen overflow-hidden bg-[#0a0a0a]">
         <ToastProvider>
           <LayoutShell>
             {children}
