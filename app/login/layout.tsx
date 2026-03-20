@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-[#0a0a0a]">
+    <html lang="en" className="w-full h-full bg-red-500">
+      <body className="flex-1 align-middle w-full h-full bg-red-500">
         {children}
       </body>
     </html>
