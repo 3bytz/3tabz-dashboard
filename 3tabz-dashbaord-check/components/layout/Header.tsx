@@ -26,14 +26,8 @@ export function Header() {
   const info = titles[path] ?? { title: "Dashboard", sub: "" };
   const router = useRouter();
   const logout = async () => {
-    try {
-      await api.adminLogout()
-    } catch {
-      // Always redirect even if API call fails
-    }
-    // Clear the admin_token cookie
-    document.cookie = 'admin_token=; Max-Age=0; path=/'
-    router.push('/login')
+    await api.adminLogout();
+    router.push("/login");
   };
   return (
     <header className="h-16 border-b border-white/8 flex items-center justify-between px-6 bg-[#0d0d0d] flex-shrink-0">

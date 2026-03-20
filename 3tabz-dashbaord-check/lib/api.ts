@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.com/v1'
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.app/v1'
 
 // ── Error type ──────────────────────────────────────────────────
 export interface ApiError extends Error { status: number; code?: string }

@@ -1,12 +1,11 @@
 'use client'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
   LayoutDashboard, Users, CreditCard, Bell,
   Brain, Activity, Settings, LogOut, ShieldAlert
 } from 'lucide-react'
-import { api } from '@/lib/api'
 
 const nav = [
   { href: '/',              icon: LayoutDashboard, label: 'Overview'      },
@@ -20,19 +19,7 @@ const nav = [
 ]
 
 export function Sidebar() {
-  const path   = usePathname()
-  const router = useRouter()
-
-  const handleSignOut = async () => {
-    try {
-      await api.adminLogout()
-    } catch {
-      // Ignore logout API errors — always clear session and redirect
-    }
-    // Clear the admin_token cookie by setting it expired
-    document.cookie = 'admin_token=; Max-Age=0; path=/'
-    router.push('/login')
-  }
+  const path = usePathname()
 
   return (
     <aside className="w-60 flex-shrink-0 border-r border-white/8 flex flex-col bg-[#0d0d0d]">
@@ -41,10 +28,10 @@ export function Sidebar() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center overflow-hidden shadow-lg shadow-accent/20">
-              <img
-                src="/tranparent-Favicon.png"
-                alt="3TABZ"
-                className="h-10 w-10 object-contain"
+              <img 
+                src="/tranparent-Favicon.png" 
+                alt="3TABZ" 
+                className="h-10 w-10 object-contain" 
               />
             </div>
             <div className="flex flex-col">
@@ -82,13 +69,10 @@ export function Sidebar() {
       {/* Footer */}
       <div className="px-3 py-4 border-t border-white/8">
         <div className="px-3 py-2 mb-1">
-          <div className="text-sm text-white font-medium">Admin</div>
-          <div className="text-xs text-[#888]">3TABZ Platform</div>
+          <div className="text-sm text-white font-medium">Admin User</div>
+          <div className="text-xs text-[#888]">admin@3tabz.app</div>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="flex items-center gap-3 px-3 py-2 text-sm text-[#888] hover:text-red-400 transition-colors w-full"
-        >
+        <button className="flex items-center gap-3 px-3 py-2 text-sm text-[#888] hover:text-red-400 transition-colors w-full">
           <LogOut size={14} strokeWidth={1.8} />
           Sign out
         </button>

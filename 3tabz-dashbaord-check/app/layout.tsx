@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { LayoutShell } from '@/components/layout/LayoutShell'
+import { Sidebar } from '@/components/layout/Sidebar'
+import { Header } from '@/components/layout/Header'
 import { ToastProvider } from '@/components/ui/Toast'
 
 export const metadata: Metadata = {
@@ -16,9 +17,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="flex h-screen overflow-hidden bg-[#0a0a0a]">
         <ToastProvider>
-          <LayoutShell>
-            {children}
-          </LayoutShell>
+          <Sidebar />
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <Header />
+            <main className="flex-1 overflow-y-auto p-6">
+              {children}
+            </main>
+          </div>
         </ToastProvider>
       </body>
     </html>

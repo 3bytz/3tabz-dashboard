@@ -1,35 +1,27 @@
-# dependencies
+# Dependencies
 node_modules/
 
-# expo
-.expo/
-dist/
-web-build/
-expo-env.d.ts
+# Next.js build output
+.next/
+out/
 
-# native
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+# Production build
+build/
 
-# metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macos
-.DS_Store
-*.pem
-
-# local env files
+# Environment files — NEVER commit these
 .env
+.env.local
 .env*.local
 
-# typescript
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+
+# TypeScript cache
 *.tsbuildinfo
+
+# Vercel
+.vercel
