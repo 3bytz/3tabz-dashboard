@@ -1,1 +1,10 @@
-{}
+{
+  "/page": "app/page.js",
+  "/users/page": "app/users/page.js",
+  "/subscriptions/page": "app/subscriptions/page.js",
+  "/notifications/page": "app/notifications/page.js",
+  "/ai-usage/page": "app/ai-usage/page.js",
+  "/referrals/page": "app/referrals/page.js",
+  "/health/page": "app/health/page.js",
+  "/content/page": "app/content/page.js"
+}
