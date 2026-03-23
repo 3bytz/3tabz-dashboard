@@ -69,9 +69,9 @@ export function Tr({ children, className }: { children: React.ReactNode; classNa
   )
 }
 
-export function Td({ children, className }: { children: React.ReactNode; className?: string }) {
+export function Td({ children, className, colSpan }: { children: React.ReactNode; className?: string; colSpan?: number }) {
   return (
-    <td className={clsx('py-3.5 pr-5 text-[#e0e0e0] align-middle', className)}>
+    <td className={clsx('py-3.5 pr-5 text-[#e0e0e0] align-middle', className)} colSpan={colSpan}>
       {children}
     </td>
   )

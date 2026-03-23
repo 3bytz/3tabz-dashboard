@@ -1,4 +1,5 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.com/v1'
+const BASE     = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.com/v1'
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== 'false'
 
 // ── Read admin_token cookie (client-side only) ───────────────────
 function getAdminToken(): string | null {
@@ -261,4 +262,13 @@ export const api = {
     req<AdminUser>('/admin/settings/admins/invite', { method: 'POST', body: JSON.stringify({ email, fullName, role }) }),
   revokeAdmin: (id: string) =>
     req<void>(`/admin/settings/admins/${id}`, { method: 'DELETE' }),
+  // ── Referral stats ────────────────────────────────────────────
+  getReferralStats: (): Promise<{
+    totalReferrals: number; completedReferrals: number;
+    rewardedReferrals: number; pendingReferrals: number; conversionRate: number;
+  }> => req('/admin/stats/referrals'),
+
+  getRecentReferrals: (limit = 50): Promise<any[]> =>
+    req(`/admin/referrals/recent?limit=${limit}`),
+
 }

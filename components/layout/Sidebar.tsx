@@ -4,7 +4,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
   LayoutDashboard, Users, CreditCard, Bell,
-  Brain, Activity, Settings, LogOut, ShieldAlert
+  Brain, Activity, Settings, LogOut, ShieldAlert,
+  Gift
 } from 'lucide-react'
 import { api } from '@/lib/api'
 
@@ -14,6 +15,7 @@ const nav = [
   { href: '/subscriptions', icon: CreditCard,      label: 'Subscriptions' },
   { href: '/notifications', icon: Bell,            label: 'Broadcasts'    },
   { href: '/ai-usage',      icon: Brain,           label: 'AI Usage'      },
+  { href: '/referrals',     icon: Gift,            label: 'Referrals'     },
   { href: '/health',        icon: Activity,        label: 'App Health'    },
   { href: '/content',       icon: ShieldAlert,     label: 'Content'       },
   { href: '/settings',      icon: Settings,        label: 'Settings'      },
@@ -27,7 +29,7 @@ export function Sidebar() {
     try {
       await api.adminLogout()
     } catch {
-      // Ignore logout API errors — always clear session and redirect
+      
     }
     // Clear the admin_token cookie by setting it expired
     document.cookie = 'admin_token=; Max-Age=0; path=/'
