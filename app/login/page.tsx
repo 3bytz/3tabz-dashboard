@@ -10,77 +10,58 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [totp, setTotp] = useState("");
-  const [partialToken, setPartialToken] = useState("");
-  const [showTotp, setShowTotp] = useState(false);
+  const [step, setStep] = useState<"creds" | "totp" | "setup">("creds");
+  const [setup, setSetup] = useState<{ secret: string; qr: string } | null>(null);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const showTotp = step !== "creds";
 
   const handleSubmit = async () => {
     setError("");
-
-    if (!showTotp) {
+    if (step === "creds") {
       if (!email || !password) return;
       setLoading(true);
       try {
-        const res = (await api.adminLogin(email, password)) as any;
-        if (res?.totpRequired && res?.partialToken) {
-          setPartialToken(res.partialToken);
-          setShowTotp(true);
-        } else if (res?.accessToken) {
-          const expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString()
-          document.cookie = `admin_token=${res.accessToken}; expires=${expires}; path=/; SameSite=Lax`
-          router.push("/");
+        const res = await api.login(email, password);
+        if (res.signedIn) {
+          router.replace("/");
+        } else if (res.totpRequired) {
+          setStep("totp");
+        } else if (res.totpSetupRequired) {
+          const s = await api.startTotpSetup();
+          setSetup(s);
+          setStep("setup");
         }
       } catch (e: any) {
-        const msg = e?.message ?? "";
-        if (
-          msg.toLowerCase().includes("invalid") ||
-          msg.toLowerCase().includes("credentials")
-        ) {
-          setError("Invalid email or password.");
-        } else if (
-          msg.toLowerCase().includes("suspended") ||
-          msg.toLowerCase().includes("banned")
-        ) {
-          setError("This account has been suspended.");
-        } else {
-          setError(msg || "Sign in failed. Please try again.");
-        }
+        const msg = String(e?.message ?? "");
+        if (e?.status === 429 || /locked|too many/i.test(msg)) setError("Too many attempts. Wait a few minutes and try again.");
+        else if (/suspended|banned|inactive/i.test(msg)) setError("This account is not active.");
+        else setError("Invalid email or password.");
       } finally {
         setLoading(false);
+        setPassword("");
       }
       return;
     }
 
-    if (totp.length < 6) {
+    if (totp.length !== 6) {
       setError("Enter the 6-digit code from your authenticator app.");
       return;
     }
     setLoading(true);
     try {
-      const totpRes = (await api.adminLogin(email, password, totp, partialToken)) as any;
-      if (totpRes?.accessToken) {
-        const expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toUTCString()
-        document.cookie = `admin_token=${totpRes.accessToken}; expires=${expires}; path=/; SameSite=Lax`
-      }
-      router.push("/");
+      if (step === "totp") await api.verifyTotp(totp);
+      else await api.enableTotp(totp);
+      router.replace("/");
     } catch (e: any) {
-      const msg = e?.message ?? "";
-      if (
-        msg.toLowerCase().includes("totp") ||
-        msg.toLowerCase().includes("code") ||
-        msg.toLowerCase().includes("invalid")
-      ) {
-        setError("Invalid authenticator code. Please try again.");
-        setTotp("");
-      } else if (msg.toLowerCase().includes("expired")) {
-        setError("Session expired. Please start again.");
-        setShowTotp(false);
-        setPartialToken("");
-        setTotp("");
+      const msg = String(e?.message ?? "");
+      if (/expired|start again/i.test(msg) || e?.status === 401 && /sign-in/i.test(msg)) {
+        setError("Your sign-in expired. Please start again.");
+        goBack();
       } else {
-        setError(msg || "Verification failed.");
+        setError("That code didn't work. Check your phone's time is automatic and try again.");
+        setTotp("");
       }
     } finally {
       setLoading(false);
@@ -88,10 +69,9 @@ export default function LoginPage() {
   };
 
   const goBack = () => {
-    setShowTotp(false);
-    setPartialToken("");
+    setStep("creds");
+    setSetup(null);
     setTotp("");
-    setError("");
   };
 
   return (
@@ -113,7 +93,7 @@ export default function LoginPage() {
         {/* Card */}
         <div className="border border-white/8 bg-[#111] p-7">
           <h1 className="font-display font-bold text-lg text-white mb-1">
-            {showTotp ? "Two-factor verification" : "Sign in to dashboard"}
+            {step === "setup" ? "Set up two-factor sign-in" : showTotp ? "Two-factor verification" : "Sign in to dashboard"}
           </h1>
           <p className="text-xs text-[#525252] mb-6">
             {showTotp
@@ -129,7 +109,7 @@ export default function LoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@3tabz.app"
+                  placeholder="you@3tabz.com"
                   autoComplete="email"
                   className="w-full bg-[#0a0a0a] border border-white/10 text-white text-sm px-3 py-2.5 outline-none focus:border-white/30 transition-colors placeholder:text-[#404040]"
                 />
@@ -165,6 +145,17 @@ export default function LoginPage() {
                 />
                 Signed in as {email}
               </div>
+              {step === "setup" && setup && (
+                <div className="space-y-2 mb-3">
+                  <p className="text-xs text-[#a0a0a0]">
+                    Two-factor sign-in is required for every admin. Scan this with Google Authenticator, 1Password,
+                    Authy or Microsoft Authenticator, then enter the 6-digit code.
+                  </p>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={setup.qr} alt="Authenticator QR code" width={180} height={180} className="mx-auto bg-white p-2" />
+                  <p className="text-[10px] text-[#525252] break-all text-center">Can&apos;t scan? Key: {setup.secret}</p>
+                </div>
+              )}
               <div className="space-y-1">
                 <label className="text-xs text-[#525252]">
                   Authenticator code
@@ -196,14 +187,14 @@ export default function LoginPage() {
           <button
             onClick={handleSubmit}
             disabled={
-              loading || !email || !password || (showTotp && totp.length < 6)
+              loading || (!showTotp && (!email || !password)) || (showTotp && totp.length < 6)
             }
             className="w-full mt-5 bg-[#C8F135] text-black text-sm font-bold py-2.5 hover:bg-[#A8D015] transition-colors disabled:opacity-40 disabled:cursor-not-allowed font-display tracking-wide"
           >
             {loading
               ? "Verifying…"
               : showTotp
-                ? "Verify & sign in"
+                ? (step === "setup" ? "Enable & sign in" : "Verify & sign in")
                 : "Continue →"}
           </button>
 

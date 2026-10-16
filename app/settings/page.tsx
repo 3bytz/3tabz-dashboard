@@ -203,9 +203,9 @@ export default function SettingsPage() {
             <Toggle label="Pro Upgrades"
               sub="Allow users to purchase Pro subscriptions via in-app purchase."
               value={flags.proUpgrades} onChange={setFlag('proUpgrades')} />
-            <Toggle label="Data Export Requests"
-              sub="Allow users to request their data export from the Privacy & Data screen."
-              value={flags.dataExports} onChange={setFlag('dataExports')} />
+            <p className="text-xs text-[#666] py-2">
+              Data export and account deletion are legal rights (NDPA 2023, UK GDPR) and cannot be switched off.
+            </p>
             <div className="pt-3">
               <Button variant="primary" size="sm" onClick={saveFlags} disabled={savingFlags}>
                 {savingFlags ? <><Loader2 size={12} className="animate-spin" /> Saving…</> : 'Save flags'}

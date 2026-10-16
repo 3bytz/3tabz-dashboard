@@ -20,7 +20,7 @@ function SetupForm() {
     if (!token) setError('Invalid or missing invite link. Please ask for a new invite.')
   }, [token])
 
-  const valid = password.length >= 8 && password === confirm
+  const valid = password.length >= 12 && password.length <= 72 && password === confirm
 
   const handleSubmit = async () => {
     if (!valid || !token) return
@@ -29,7 +29,7 @@ function SetupForm() {
     try {
       await api.setupAccount(token, password)
       setDone(true)
-      setTimeout(() => router.push('/login'), 2000)
+      setTimeout(() => router.push('/login'), 2000) // TOTP enrolment happens at first sign-in
     } catch (e: any) {
       const msg = e?.message ?? ''
       if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('invalid')) {
@@ -74,7 +74,7 @@ function SetupForm() {
                       type={showPw ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      placeholder="Minimum 8 characters"
+                      placeholder="At least 12 characters"
                       autoComplete="new-password"
                       className="w-full bg-[#0a0a0a] border border-white/10 text-white text-sm px-3 py-2.5 pr-10 outline-none focus:border-white/30 transition-colors placeholder:text-[#404040]"
                     />
@@ -98,7 +98,7 @@ function SetupForm() {
                 </div>
                 {password.length > 0 && confirm.length > 0 && !valid && (
                   <p className="text-xs text-red-400">
-                    {password.length < 8 ? 'Password must be at least 8 characters' : 'Passwords do not match'}
+                    {password.length < 12 ? 'Use at least 12 characters (a passphrase works well)' : 'Passwords do not match'}
                   </p>
                 )}
               </div>

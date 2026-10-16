@@ -6,7 +6,7 @@ import { Header } from './Header'
 export function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
-  if (pathname === '/login') {
+  if (pathname === '/login' || pathname.startsWith('/setup')) {
     return <>{children}</>
   }
 
