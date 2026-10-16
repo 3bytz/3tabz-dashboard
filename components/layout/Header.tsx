@@ -19,6 +19,9 @@ const titles: Record<string, { title: string; sub: string }> = {
   "/health": { title: "App Health", sub: "Infrastructure and cron job status" },
   "/content": { title: "Content", sub: "Flags, data exports, deletion queue" },
   "/settings": { title: "Settings", sub: "Platform configuration" },
+  "/audit-log": { title: "Audit log", sub: "Every admin action" },
+  "/notification-performance": { title: "Push performance", sub: "Sent, opened and suppressed by type" },
+  "/meal-templates": { title: "Meal templates", sub: "Nutrition planner content" },
 };
 
 export function Header() {
@@ -31,9 +34,8 @@ export function Header() {
     } catch {
       // Always redirect even if API call fails
     }
-    // Clear the admin_token cookie
-    document.cookie = 'admin_token=; Max-Age=0; path=/'
-    router.push('/login')
+    // Session cookie is HttpOnly and cleared by the server (/api/session/logout).
+    router.replace('/login')
   };
   return (
     <header className="h-16 border-b border-white/8 flex items-center justify-between px-6 bg-[#0d0d0d] flex-shrink-0">

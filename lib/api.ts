@@ -1,11 +1,11 @@
-const BASE     = process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.com/v1'
-const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK !== 'false'
+// All calls go to this app's own /api/* route handlers (BFF). The admin session lives
+// in an HttpOnly cookie that JavaScript cannot read; the BFF adds it server-side.
+const BASE = '/api'
 
-// ── Read admin_token cookie (client-side only) ───────────────────
-function getAdminToken(): string | null {
-  if (typeof document === 'undefined') return null  // SSR guard
-  const match = document.cookie.match(/(?:^|;\s*)admin_token=([^;]*)/)
-  return match ? decodeURIComponent(match[1]) : null
+function getCsrf(): string {
+  if (typeof document === 'undefined') return ''
+  const m = document.cookie.match(/(?:^|;\s*)(?:__Host-)?3tabz_csrf=([^;]*)/)
+  return m ? decodeURIComponent(m[1]) : ''
 }
 
 // ── Error type ──────────────────────────────────────────────────
@@ -98,30 +98,41 @@ export interface AppSettings {
   cronJobs: { id: string; name: string; schedule: string; enabled: boolean }[]
 }
 
-// ── Core fetch helper ───────────────────────────────────────────
-// partialToken is used for the TOTP verification step only.
-async function req<T>(
-  path: string,
-  options?: RequestInit & { partialToken?: string },
-): Promise<T> {
-  const { partialToken, ...fetchOptions } = options ?? {}
+export interface AuditEntry {
+  id: string; at: string; admin: string; role: string; method: string; route: string
+  targetId?: string | null; action: string; status: number; ip?: string | null; fields?: string[]
+}
+export interface NotificationTypePerformance {
+  type: string; sent: number; opened: number; openRatePct: number
+  suppressedPref: number; suppressedQuiet: number; suppressedCap: number; noTokens: number
+}
+export interface MealTemplate {
+  id: string; name: string; slots: string[]; energy: 'light' | 'medium' | 'hearty'
+  costNaira: number[]; tags: string[]; allergens: string[]; ingredients: string[]
+  regions?: string[]; diet?: string[]; note?: string
+}
 
+// ── Core fetch helper ───────────────────────────────────────────
+async function req<T>(path: string, options?: RequestInit): Promise<T> {
+  const method = (options?.method ?? 'GET').toUpperCase()
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(fetchOptions.headers as Record<string, string> | undefined),
+    ...(options?.headers as Record<string, string> | undefined),
   }
-
-  // For TOTP step 2 use partialToken, otherwise read stored admin_token cookie
-  const token = partialToken ?? getAdminToken()
-  if (token) headers['Authorization'] = `Bearer ${token}`
+  if (method !== 'GET') headers['X-CSRF-Token'] = getCsrf()
 
   const res = await fetch(`${BASE}${path}`, {
-    ...fetchOptions,
-    credentials: 'include',
+    ...options,
+    method,
+    credentials: 'same-origin',
+    cache: 'no-store',
     headers,
   })
 
   if (res.status === 401) {
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+      window.location.href = '/login'
+    }
     const err = new Error('Session expired — please sign in again') as ApiError
     err.status = 401
     throw err
@@ -129,7 +140,8 @@ async function req<T>(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    const err  = new Error(body?.message ?? body?.error ?? `API error ${res.status}`) as ApiError
+    const msg = Array.isArray(body?.message) ? body.message.join('. ') : body?.message
+    const err  = new Error(msg ?? body?.error ?? `API error ${res.status}`) as ApiError
     err.status = res.status
     err.code   = body?.code
     throw err
@@ -137,47 +149,27 @@ async function req<T>(
 
   if (res.status === 204) return undefined as unknown as T
   const json = await res.json()
-  return json.data ?? json
+  return (json?.data ?? json) as T
 }
 
 // ── API surface ─────────────────────────────────────────────────
 export const api = {
 
-  // ── Auth ────────────────────────────────────────────────────────
-  // Step 1: email + password → { totpRequired: true, partialToken } OR { accessToken }
-  // Step 2 (if TOTP required): partialToken + 6-digit code → { accessToken }
-  adminLogin: async (email: string, password: string, totp?: string, partialToken?: string) => {
-    if (totp && partialToken) {
-      // Step 2: verify TOTP
-      return req('/admin/auth/verify-totp', {
-        method: 'POST',
-        body: JSON.stringify({ token: totp }),
-        partialToken,
-      })
-    }
-    // Step 1: email + password
-    return req<{ totpRequired?: boolean; partialToken?: string; accessToken?: string }>(
-      '/admin/auth/login',
-      { method: 'POST', body: JSON.stringify({ email, password }) },
-    )
-  },
-
-  adminLogout: () =>
-    req('/admin/auth/logout', { method: 'POST' }),
-
-  // Called from /setup page — public endpoint, uses invite token not JWT
-  setupAccount: (inviteToken: string, password: string) =>
-    fetch(`${BASE}/admin/auth/setup-account`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inviteToken, password }),
-    }).then(async res => {
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body?.message ?? body?.error ?? 'Setup failed')
-      }
-      return res.json()
+  // ── Auth (BFF /api/session/*) ─────────────────────────────────
+  login: (email: string, password: string) =>
+    req<{ totpRequired: boolean; totpSetupRequired: boolean; signedIn: boolean }>('/session/login', {
+      method: 'POST', body: JSON.stringify({ email, password }),
     }),
+  verifyTotp: (code: string) =>
+    req<{ signedIn: boolean }>('/session/totp', { method: 'POST', body: JSON.stringify({ code }) }),
+  startTotpSetup: () =>
+    req<{ secret: string; qr: string }>('/session/totp-setup', { method: 'POST' }),
+  enableTotp: (code: string) =>
+    req<{ signedIn: boolean }>('/session/totp-enable', { method: 'POST', body: JSON.stringify({ code }) }),
+  adminLogout: () => req('/session/logout', { method: 'POST' }),
+  me: () => req<{ id: string; email: string; role: AdminUser['role']; name: string }>('/session/me'),
+  setupAccount: (inviteToken: string, password: string) =>
+    req('/session/setup-account', { method: 'POST', body: JSON.stringify({ inviteToken, password }) }),
 
   // ── Overview ──────────────────────────────────────────────────
   getOverviewStats:    () => req<OverviewStats>('/admin/stats/overview'),
@@ -254,7 +246,8 @@ export const api = {
   updateFeatureFlags:    (flags: AppSettings['flags'])            => req<void>('/admin/settings/flags',            { method: 'PATCH', body: JSON.stringify(flags)  }),
   updateBroadcastLimits: (limits: AppSettings['broadcastLimits']) => req<void>('/admin/settings/broadcast-limits', { method: 'PATCH', body: JSON.stringify(limits) }),
   updateIpAllowlist:     (allowlist: AppSettings['ipAllowlist'])  => req<void>('/admin/settings/ip-allowlist',     { method: 'PATCH', body: JSON.stringify(allowlist) }),
-  updateCronSchedules:   (jobs: AppSettings['cronJobs'])          => req<void>('/admin/settings/cron-schedules',   { method: 'PATCH', body: JSON.stringify(jobs)   }),
+  // API expects { jobs: [...] } (validated DTO); sending a bare array was rejected.
+  updateCronSchedules:   (jobs: AppSettings['cronJobs'])          => req<void>('/admin/settings/cron-schedules',   { method: 'PATCH', body: JSON.stringify({ jobs }) }),
 
   // /admin/settings/admins — matches new backend paths
   getAdmins:   () => req<AdminUser[]>('/admin/settings/admins'),
@@ -270,5 +263,18 @@ export const api = {
 
   getRecentReferrals: (limit = 50): Promise<any[]> =>
     req(`/admin/referrals/recent?limit=${limit}`),
+
+  // ── Audit log (super_admin) ───────────────────────────────────
+  getAuditLog: (page = 1, limit = 50) =>
+    req<AuditEntry[]>(`/admin/audit-log?page=${page}&limit=${limit}`),
+
+  // ── Notification performance ──────────────────────────────────
+  getNotificationPerformance: (days = 14) =>
+    req<NotificationTypePerformance[]>(`/admin/notifications/performance?days=${days}`),
+
+  // ── CMS: nutrition meal templates ─────────────────────────────
+  getMealTemplates: () => req<{ items: MealTemplate[]; usingBuiltIn: boolean }>('/admin/content/meal-templates'),
+  updateMealTemplates: (items: MealTemplate[]) =>
+    req<{ updated: boolean; count: number }>('/admin/content/meal-templates', { method: 'PATCH', body: JSON.stringify({ items }) }),
 
 }

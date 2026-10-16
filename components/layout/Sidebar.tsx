@@ -5,7 +5,7 @@ import { clsx } from 'clsx'
 import {
   LayoutDashboard, Users, CreditCard, Bell,
   Brain, Activity, Settings, LogOut, ShieldAlert,
-  Gift
+  Gift, ScrollText, BarChart3, Salad
 } from 'lucide-react'
 import { api } from '@/lib/api'
 
@@ -14,10 +14,13 @@ const nav = [
   { href: '/users',         icon: Users,           label: 'Users'         },
   { href: '/subscriptions', icon: CreditCard,      label: 'Subscriptions' },
   { href: '/notifications', icon: Bell,            label: 'Broadcasts'    },
+  { href: '/notification-performance', icon: BarChart3, label: 'Push performance' },
   { href: '/ai-usage',      icon: Brain,           label: 'AI Usage'      },
   { href: '/referrals',     icon: Gift,            label: 'Referrals'     },
   { href: '/health',        icon: Activity,        label: 'App Health'    },
   { href: '/content',       icon: ShieldAlert,     label: 'Content'       },
+  { href: '/meal-templates', icon: Salad,          label: 'Meal templates' },
+  { href: '/audit-log',     icon: ScrollText,      label: 'Audit log'     },
   { href: '/settings',      icon: Settings,        label: 'Settings'      },
 ]
 
@@ -31,9 +34,8 @@ export function Sidebar() {
     } catch {
       
     }
-    // Clear the admin_token cookie by setting it expired
-    document.cookie = 'admin_token=; Max-Age=0; path=/'
-    router.push('/login')
+    // Session cookie is HttpOnly and cleared by the server (/api/session/logout).
+    router.replace('/login')
   }
 
   return (
