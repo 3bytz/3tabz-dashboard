@@ -32,9 +32,7 @@ export function Header() {
     try {
       await api.adminLogout()
     } catch {
-      // Always redirect even if API call fails
     }
-    // Session cookie is HttpOnly and cleared by the server (/api/session/logout).
     router.replace('/login')
   };
   return (

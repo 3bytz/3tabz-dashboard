@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { api, type AuditEntry } from '@/lib/api'
 import { SectionHeader, Card, Table, Tr, Td, Badge, Button } from '@/components/ui'
 
-/** Read-only, append-only log of every admin action (super_admin only). */
 export default function AuditLogPage() {
   const [rows, setRows] = useState<AuditEntry[]>([])
   const [page, setPage] = useState(1)

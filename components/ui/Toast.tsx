@@ -3,7 +3,6 @@ import { useState, useCallback, useEffect, createContext, useContext } from 'rea
 import { clsx } from 'clsx'
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react'
 
-// ── Types ──────────────────────────────────────────────────────
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info'
 
 export interface Toast {
@@ -13,7 +12,6 @@ export interface Toast {
   duration?: number
 }
 
-// ── Context ────────────────────────────────────────────────────
 interface ToastContextValue {
   toast: (message: string, variant?: ToastVariant, duration?: number) => void
   success: (message: string) => void
@@ -24,7 +22,6 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
-// ── Provider ───────────────────────────────────────────────────
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
@@ -56,14 +53,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ── Hook ───────────────────────────────────────────────────────
 export function useToast() {
   const ctx = useContext(ToastContext)
   if (!ctx) throw new Error('useToast must be used inside <ToastProvider>')
   return ctx
 }
 
-// ── Individual Toast item ──────────────────────────────────────
 const ICONS: Record<ToastVariant, React.ReactNode> = {
   success: <CheckCircle  size={15} className="text-green-400 flex-shrink-0"  />,
   error:   <XCircle      size={15} className="text-red-400 flex-shrink-0"    />,
@@ -84,7 +79,6 @@ function ToastItem({
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    // Trigger enter animation
     const id = requestAnimationFrame(() => setVisible(true))
     return () => cancelAnimationFrame(id)
   }, [])
@@ -112,7 +106,6 @@ function ToastItem({
   )
 }
 
-// ── Toaster container ──────────────────────────────────────────
 function Toaster({
   toasts, onDismiss,
 }: { toasts: (Toast & { _exiting?: boolean })[]; onDismiss: (id: string) => void }) {

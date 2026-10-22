@@ -27,17 +27,14 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onClose}
       />
-      {/* Panel */}
       <div className={clsx(
         'relative w-full bg-[#111] border border-white/10 shadow-2xl',
         widths[size]
       )}>
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
           <h3 className="font-display font-bold text-white text-base">{title}</h3>
           <button
@@ -47,9 +44,7 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
             <X size={16} />
           </button>
         </div>
-        {/* Body */}
         <div className="px-5 py-4">{children}</div>
-        {/* Footer */}
         {footer && (
           <div className="flex justify-end gap-2 px-5 py-3 border-t border-white/8 bg-[#0d0d0d]">
             {footer}
@@ -60,7 +55,6 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: M
   )
 }
 
-// ── Confirm Modal convenience wrapper ──────────────────────────
 interface ConfirmModalProps {
   open: boolean
   onClose: () => void

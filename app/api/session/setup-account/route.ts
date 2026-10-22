@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callApi, checkCsrf, jsonError } from '@/lib/server/session'
 
-/** Invite acceptance (public): sets the new admin's password. TOTP is enrolled at first login. */
 export async function POST(req: NextRequest) {
   const bad = checkCsrf(req)
   if (bad) return jsonError(403, bad)

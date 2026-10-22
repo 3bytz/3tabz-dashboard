@@ -52,7 +52,6 @@ export default function HealthPage() {
 
   useEffect(() => { load() }, [load])
 
-  // Auto-refresh every 60s
   useEffect(() => {
     const interval = setInterval(load, 60_000)
     return () => clearInterval(interval)
@@ -74,7 +73,6 @@ export default function HealthPage() {
   return (
     <div className="max-w-[1400px] space-y-5">
 
-      {/* Service status */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/6 border border-white/6">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
@@ -98,7 +96,6 @@ export default function HealthPage() {
         )}
       </div>
 
-      {/* Perf stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/6 border border-white/6">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
@@ -114,7 +111,6 @@ export default function HealthPage() {
         )}
       </div>
 
-      {/* Response times + push tokens */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card className="lg:col-span-2">
           <SectionHeader title="Response Times" sub="p50 and p95 — last 6 hours" />
@@ -172,7 +168,6 @@ export default function HealthPage() {
         </Card>
       </div>
 
-      {/* Error rate by endpoint */}
       <Card>
         <SectionHeader
           title="Error Rate by Endpoint"
@@ -214,7 +209,6 @@ export default function HealthPage() {
         }
       </Card>
 
-      {/* Version distribution */}
       <Card>
         <SectionHeader title="App Version Distribution" />
         {loading
@@ -236,7 +230,6 @@ export default function HealthPage() {
         }
       </Card>
 
-      {/* Cron jobs */}
       <Card>
         <SectionHeader title="Background Jobs" sub="Cron status and last run" />
         {loading

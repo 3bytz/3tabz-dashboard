@@ -1,14 +1,3 @@
-/**
- * Server-only session helpers for the admin BFF (backend-for-frontend).
- *
- * WHY: the admin JWT used to live in a JavaScript-readable cookie (`admin_token`,
- * SameSite=Lax, no HttpOnly) and was sent from the browser straight to the API. Any
- * XSS in the dashboard could steal an admin session. Now:
- *  - the JWT sits in an HttpOnly, Secure, SameSite=Strict cookie the browser JS can't read;
- *  - the browser only talks to this Next.js app (/api/session/*, /api/admin/*), which
- *    attaches the token server-side;
- *  - state-changing requests need a CSRF double-submit token and a same-origin Origin header.
- */
 import 'server-only'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
@@ -20,7 +9,6 @@ export const SESSION_COOKIE = `${PREFIX}3tabz_admin`
 export const PENDING_COOKIE = `${PREFIX}3tabz_pending`
 export const CSRF_COOKIE = `${PREFIX}3tabz_csrf`
 
-/** Server-side API base (not exposed to the browser). */
 export const API_URL = (process.env.ADMIN_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'https://api.3tabz.com/v1').replace(/\/$/, '')
 
 const base = { httpOnly: true, secure: PROD, sameSite: 'strict' as const, path: '/' }
@@ -41,16 +29,15 @@ export function clearAll(res: NextResponse) {
 }
 
 export function setCsrf(res: NextResponse) {
-  // Readable by JS on purpose (double-submit). Useless to an attacker without same-origin JS.
   res.cookies.set(CSRF_COOKIE, crypto.randomBytes(24).toString('base64url'), { ...base, httpOnly: false, maxAge: 8 * 3600 })
 }
 
-export function getSessionToken(): string | null {
-  return cookies().get(SESSION_COOKIE)?.value || null
+export async function getSessionToken(): Promise<string | null> {
+  return (await cookies()).get(SESSION_COOKIE)?.value || null
 }
 
-export function getPending(): { kind: 'totp' | 'setup'; token: string } | null {
-  const raw = cookies().get(PENDING_COOKIE)?.value
+export async function getPending(): Promise<{ kind: 'totp' | 'setup'; token: string } | null> {
+  const raw = (await cookies()).get(PENDING_COOKIE)?.value
   if (!raw) return null
   const i = raw.indexOf('.')
   const kind = raw.slice(0, i)
@@ -58,7 +45,6 @@ export function getPending(): { kind: 'totp' | 'setup'; token: string } | null {
   return { kind, token: raw.slice(i + 1) }
 }
 
-/** Same-origin + CSRF double-submit check for state-changing requests. */
 export function checkCsrf(req: NextRequest): string | null {
   const origin = req.headers.get('origin')
   const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host')
@@ -68,7 +54,7 @@ export function checkCsrf(req: NextRequest): string | null {
   } catch {
     return 'Bad origin'
   }
-  if (req.method === 'POST' && req.nextUrl.pathname.startsWith('/api/session/')) return null // login has no session yet
+  if (req.method === 'POST' && req.nextUrl.pathname.startsWith('/api/session/')) return null
   const header = req.headers.get('x-csrf-token') ?? ''
   const cookie = req.cookies.get(CSRF_COOKIE)?.value ?? ''
   if (!header || !cookie || header.length !== cookie.length) return 'CSRF token missing'

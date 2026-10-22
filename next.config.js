@@ -1,7 +1,3 @@
-/** @type {import('next').NextConfig} */
-
-// Strict security headers. The dashboard only talks to its own origin (/api/*);
-// the API is called server-side by the BFF, so connect-src stays 'self'.
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'" + (process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"),

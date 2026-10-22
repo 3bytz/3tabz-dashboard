@@ -76,11 +76,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#0a0a0a] flex items-center justify-center p-6">
-      {/* Background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(200,241,53,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(200,241,53,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
 
       <div className="relative w-full max-w-sm">
-        {/* Logo */}
         <div className="flex items-center gap-3 mb-10 justify-center">
           <span className="font-display font-bold text-2xl tracking-tight text-white">
             3TAB<span className="text-[#C8F135]">Z</span>
@@ -90,7 +88,6 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* Card */}
         <div className="border border-white/8 bg-[#111] p-7">
           <h1 className="font-display font-bold text-lg text-white mb-1">
             {step === "setup" ? "Set up two-factor sign-in" : showTotp ? "Two-factor verification" : "Sign in to dashboard"}
@@ -151,7 +148,6 @@ export default function LoginPage() {
                     Two-factor sign-in is required for every admin. Scan this with Google Authenticator, 1Password,
                     Authy or Microsoft Authenticator, then enter the 6-digit code.
                   </p>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={setup.qr} alt="Authenticator QR code" width={180} height={180} className="mx-auto bg-white p-2" />
                   <p className="text-[10px] text-[#525252] break-all text-center">Can&apos;t scan? Key: {setup.secret}</p>
                 </div>

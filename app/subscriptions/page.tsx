@@ -11,6 +11,12 @@ function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-white/6 rounded ${className}`} />
 }
 
+function platformLabel(p: string): string {
+  return ({
+    apple: 'Apple', google: 'Google Play', revenuecat: 'In-app', stripe: 'Web · Stripe', paystack: 'Web · Paystack', manual: 'Comp',
+  } as Record<string, string>)[p] ?? p
+}
+
 export default function SubscriptionsPage() {
   const { success, error: toastError } = useToast()
 
@@ -45,10 +51,10 @@ export default function SubscriptionsPage() {
   })
 
   const activeRows   = rows.filter(s => s.status === 'active')
-  const mrr          = activeRows.reduce((a, s) => a + (s.revenue / 3 || 2.99), 0) // estimate monthly
+  const mrr          = activeRows.reduce((a, s) => a + (s.revenue / 3 || 2.99), 0)
   const totalRev     = rows.reduce((a, s) => a + s.revenue, 0)
-  const appleActive  = activeRows.filter(s => s.platform === 'apple').length
-  const googleActive = activeRows.filter(s => s.platform === 'google').length
+  const appActive    = activeRows.filter(s => ['apple', 'google', 'revenuecat'].includes(String(s.platform))).length
+  const webActive    = activeRows.filter(s => ['stripe', 'paystack'].includes(String(s.platform))).length
 
   const statusColor = (s: string) =>
     s === 'active' ? 'green' : s === 'cancelled' ? 'red' : s === 'expired' ? 'gray' : 'yellow'
@@ -98,7 +104,6 @@ export default function SubscriptionsPage() {
   return (
     <div className="max-w-[1400px] space-y-5">
 
-      {/* Stats strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/6 border border-white/6">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
@@ -108,8 +113,8 @@ export default function SubscriptionsPage() {
           <>
             <StatCard label="MRR"           value={`$${mrr.toFixed(2)}`}      sub={`$${(mrr*12).toFixed(0)} ARR`} accent />
             <StatCard label="Total Revenue" value={`$${totalRev.toFixed(2)}`} sub="All time" />
-            <StatCard label="Apple active"  value={appleActive}                sub="iOS subscribers" />
-            <StatCard label="Google active" value={googleActive}               sub="Android subscribers" />
+            <StatCard label="In-app active" value={appActive}                  sub="App Store and Google Play" />
+            <StatCard label="Web active"    value={webActive}                  sub="Stripe and Paystack" />
           </>
         )}
       </div>
@@ -135,7 +140,9 @@ export default function SubscriptionsPage() {
             ]} />
             <Select value={platformFilter} onChange={setPlatformFilter} options={[
               { value: 'all', label: 'All platforms' },
-              { value: 'apple', label: '🍎 Apple' }, { value: 'google', label: '🤖 Google' },
+              { value: 'apple', label: 'Apple (direct)' }, { value: 'google', label: 'Google (direct)' },
+              { value: 'revenuecat', label: 'In-app (RevenueCat)' }, { value: 'stripe', label: 'Web · Stripe' },
+              { value: 'paystack', label: 'Web · Paystack' }, { value: 'manual', label: 'Comp' },
             ]} />
             <Button variant="secondary" size="sm" onClick={exportCSV} disabled={loading}>
               <Download size={12} /> Export CSV
@@ -158,7 +165,7 @@ export default function SubscriptionsPage() {
                 <div className="text-white text-sm font-medium">{s.userName}</div>
                 <div className="text-xs text-[#525252]">{s.email}</div>
               </Td>
-              <Td><Badge color="gray">{s.platform === 'apple' ? '🍎 Apple' : '🤖 Google'}</Badge></Td>
+              <Td><Badge color="gray">{platformLabel(String(s.platform))}</Badge></Td>
               <Td><Badge color={statusColor(s.status) as any}>{s.status}</Badge></Td>
               <Td>
                 <span className={s.autoRenew ? 'text-green-400 text-xs' : 'text-[#525252] text-xs'}>
@@ -197,7 +204,6 @@ export default function SubscriptionsPage() {
         </Table>
       </div>
 
-      {/* Inline detail panel */}
       {detail && (
         <div className="border border-white/8 bg-[#111] p-5">
           <div className="flex justify-between items-start mb-4">
@@ -211,7 +217,7 @@ export default function SubscriptionsPage() {
             {[
               { label: 'Product ID', value: detail.productId },
               { label: 'Record ID',  value: detail.id },
-              { label: 'Platform',   value: detail.platform === 'apple' ? '🍎 Apple' : '🤖 Google' },
+              { label: 'Platform',   value: platformLabel(String(detail.platform)) },
               { label: 'Auto-renew', value: detail.autoRenew ? 'Enabled' : 'Disabled' },
             ].map(r => (
               <div key={r.label} className="bg-[#0a0a0a] border border-white/6 p-3">

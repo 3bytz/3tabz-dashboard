@@ -1,7 +1,6 @@
 'use client'
 import { clsx } from 'clsx'
 
-// ── Stat Card ──────────────────────────────────────────────────
 export function StatCard({ label, value, sub, accent }: {
   label: string; value: string | number; sub?: string; accent?: boolean
 }) {
@@ -19,7 +18,6 @@ export function StatCard({ label, value, sub, accent }: {
   )
 }
 
-// ── Badge ──────────────────────────────────────────────────────
 export function Badge({ children, color = 'gray' }: {
   children: React.ReactNode
   color?: 'green' | 'red' | 'yellow' | 'gray' | 'accent'
@@ -41,7 +39,6 @@ export function Badge({ children, color = 'gray' }: {
   )
 }
 
-// ── Table ──────────────────────────────────────────────────────
 export function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
   return (
     <div className="overflow-x-auto">
@@ -77,7 +74,6 @@ export function Td({ children, className, colSpan }: { children: React.ReactNode
   )
 }
 
-// ── Section Header ─────────────────────────────────────────────
 export function SectionHeader({ title, sub, action }: {
   title: string; sub?: string; action?: React.ReactNode
 }) {
@@ -92,7 +88,6 @@ export function SectionHeader({ title, sub, action }: {
   )
 }
 
-// ── Card ───────────────────────────────────────────────────────
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={clsx('border border-white/8 bg-[#111] p-5', className)}>
@@ -101,7 +96,6 @@ export function Card({ children, className }: { children: React.ReactNode; class
   )
 }
 
-// ── Button ─────────────────────────────────────────────────────
 export function Button({ children, variant = 'primary', onClick, disabled, className, size = 'md' }: {
   children: React.ReactNode
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
@@ -134,7 +128,6 @@ export function Button({ children, variant = 'primary', onClick, disabled, class
   )
 }
 
-// ── Input ──────────────────────────────────────────────────────
 export function Input({ placeholder, value, onChange, className, type = 'text' }: {
   placeholder?: string; value?: string; onChange?: (v: string) => void
   className?: string; type?: string
@@ -154,7 +147,6 @@ export function Input({ placeholder, value, onChange, className, type = 'text' }
   )
 }
 
-// ── Select ─────────────────────────────────────────────────────
 export function Select({ value, onChange, options, className }: {
   value: string; onChange: (v: string) => void
   options: { value: string; label: string }[]; className?: string
@@ -174,7 +166,6 @@ export function Select({ value, onChange, options, className }: {
   )
 }
 
-// ── Status dot ─────────────────────────────────────────────────
 export function StatusDot({ status }: { status: 'operational' | 'degraded' | 'outage' }) {
   const colors = {
     operational: 'bg-green-400',
@@ -189,7 +180,6 @@ export function StatusDot({ status }: { status: 'operational' | 'degraded' | 'ou
   )
 }
 
-// ── Textarea ───────────────────────────────────────────────────
 export function Textarea({ placeholder, value, onChange, rows = 3, className, maxLength }: {
   placeholder?: string; value?: string; onChange?: (v: string) => void
   rows?: number; className?: string; maxLength?: number

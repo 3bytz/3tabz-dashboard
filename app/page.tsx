@@ -8,7 +8,6 @@ import {
 import { api } from '@/lib/api'
 import type { OverviewStats, SignupDay, ActiveMonth, RevenueMonth } from '@/lib/api'
 
-// ── Skeleton ──────────────────────────────────────────────────
 function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-white/6 rounded ${className}`} />
 }
@@ -70,7 +69,6 @@ export default function OverviewPage() {
   return (
     <div className="space-y-6 max-w-[1400px]">
 
-      {/* Top stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/6 border border-white/6">
         {loading ? (
           Array.from({ length: 4 }).map((_, i) => (
@@ -101,7 +99,6 @@ export default function OverviewPage() {
         )}
       </div>
 
-      {/* Charts row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <SectionHeader title="Daily Signups" sub="Last 30 days" />
@@ -140,7 +137,6 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Charts row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <SectionHeader title="MRR Growth" sub="Monthly recurring revenue" />

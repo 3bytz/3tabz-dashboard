@@ -110,7 +110,6 @@ export default function ContentPage() {
         </div>
       )}
 
-      {/* Summary strip */}
       <div className="grid grid-cols-3 gap-px bg-white/6 border border-white/6">
         <div className="bg-[#111] p-4 flex items-center gap-3">
           <Flag size={16} className={pendingFlags > 0 ? 'text-yellow-400' : 'text-[#525252]'} />
@@ -141,7 +140,6 @@ export default function ContentPage() {
         </div>
       </div>
 
-      {/* Flagged AI Suggestions */}
       <Card>
         <SectionHeader
           title="Flagged AI Suggestions"
@@ -194,7 +192,6 @@ export default function ContentPage() {
         }
       </Card>
 
-      {/* Data Export Requests */}
       <Card>
         <SectionHeader
           title="Data Export Requests"
@@ -232,7 +229,6 @@ export default function ContentPage() {
         }
       </Card>
 
-      {/* Account Deletion Queue */}
       <Card>
         <SectionHeader
           title="Account Deletion Queue"
@@ -289,7 +285,6 @@ export default function ContentPage() {
         }
       </Card>
 
-      {/* Modals */}
       <ConfirmModal
         open={!!dismissId}
         onClose={() => setDismissId(null)}

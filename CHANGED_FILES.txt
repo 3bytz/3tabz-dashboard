@@ -1,21 +1,47 @@
-ADDED    .env.example
-ADDED    CHANGED_FILES.txt
-ADDED    app/api
-ADDED    app/audit-log
-ADDED    app/meal-templates
-ADDED    app/notification-performance
-ADDED    lib/server
-ADDED    package-lock.json
-DELETED  lib/mock-data.ts
-MODIFIED README.md
-MODIFIED app/login/page.tsx
-MODIFIED app/settings/page.tsx
-MODIFIED app/setup/page.tsx
-MODIFIED components/layout/Header.tsx
-MODIFIED components/layout/LayoutShell.tsx
-MODIFIED components/layout/Sidebar.tsx
-MODIFIED lib/api.ts
-MODIFIED middleware.ts
-MODIFIED next-env.d.ts
-MODIFIED next.config.js
-MODIFIED package.json
+3TABZ 1.1.0 (22 Oct 2026): changes against the files you uploaded
+
+Added (2)
+  + package-lock.json
+  + proxy.ts
+
+Modified (37)
+  ~ app/api/admin/[...path]/route.ts
+  ~ app/api/session/logout/route.ts
+  ~ app/api/session/me/route.ts
+  ~ app/api/session/setup-account/route.ts
+  ~ app/api/session/totp-enable/route.ts
+  ~ app/api/session/totp-setup/route.ts
+  ~ app/api/session/totp/route.ts
+  ~ app/audit-log/page.tsx
+  ~ app/content/page.tsx
+  ~ app/health/page.tsx
+  ~ app/login/page.tsx
+  ~ app/meal-templates/page.tsx
+  ~ app/notification-performance/page.tsx
+  ~ app/notifications/page.tsx
+  ~ app/page.tsx
+  ~ app/referrals/page.tsx
+  ~ app/settings/page.tsx
+  ~ app/setup/page.tsx
+  ~ app/subscriptions/page.tsx
+  ~ app/users/[id]/page.tsx
+  ~ app/users/page.tsx
+  ~ components/layout/Header.tsx
+  ~ components/layout/LayoutShell.tsx
+  ~ components/layout/Sidebar.tsx
+  ~ components/ui/Modal.tsx
+  ~ components/ui/Toast.tsx
+  ~ components/ui/index.tsx
+  ~ lib/api.ts
+  ~ lib/server/session.ts
+  ~ next.config.js
+  ~ package.json
+  ~ public/AppIcon.png
+  ~ public/Logo.png
+  ~ public/favicon2.png
+  ~ public/tranparent-Favicon.png
+  ~ public/tranparentAppIcon.png
+  ~ tsconfig.json
+
+Deleted (1)
+  - middleware.ts
