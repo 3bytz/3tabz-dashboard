@@ -147,7 +147,6 @@ export default function UserDetailPage() {
         <ArrowLeft size={12} /> Back to users
       </button>
 
-      {/* Header card */}
       <div className="border border-white/8 bg-[#111] p-5 flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="font-display font-bold text-xl text-white mb-1">{user.name}</h2>
@@ -183,7 +182,6 @@ export default function UserDetailPage() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/6 border border-white/6">
         {[
           { label: 'Collections',  value: user.collections },
@@ -198,7 +196,6 @@ export default function UserDetailPage() {
         ))}
       </div>
 
-      {/* Subscription History */}
       <Card>
         <SectionHeader
           title="Subscription History"
@@ -213,7 +210,7 @@ export default function UserDetailPage() {
             <Table headers={['Platform', 'Status', 'Product', 'Started', 'Expires', 'Revenue', 'Auto-renew']}>
               {subs.map(s => (
                 <Tr key={s.id}>
-                  <Td><Badge color="gray">{s.platform === 'apple' ? '🍎 Apple' : '🤖 Google'}</Badge></Td>
+                  <Td><Badge color="gray">{({ apple: 'Apple', google: 'Google Play', revenuecat: 'In-app', stripe: 'Web · Stripe', paystack: 'Web · Paystack', manual: 'Comp' } as Record<string, string>)[String(s.platform)] ?? String(s.platform)}</Badge></Td>
                   <Td><Badge color={statusColor(s.status) as any}>{s.status}</Badge></Td>
                   <Td><code className="text-xs text-[#525252] font-mono">{s.productId}</code></Td>
                   <Td><span className="text-xs text-[#525252]">{s.started}</span></Td>
@@ -245,12 +242,11 @@ export default function UserDetailPage() {
         )}
       </Card>
 
-      {/* Device & Push Token */}
       <Card>
         <SectionHeader title="Device & Push Token" />
         <div className="space-y-0 text-sm">
           {[
-            { label: 'Platform',     value: user.platform === 'ios' ? '🍎 iOS' : '🤖 Android', highlight: false },
+            { label: 'Platform',     value: user.platform === 'ios' ? 'iOS' : 'Android', highlight: false },
             { label: 'Push token',   value: user.pushToken ?? 'Not registered',                 highlight: false },
             { label: 'Token status', value: user.pushTokenStatus ?? 'Unknown',                  highlight: user.pushTokenStatus === 'registered' },
             { label: 'Last seen',    value: user.lastActive,                                     highlight: false },
@@ -263,7 +259,6 @@ export default function UserDetailPage() {
         </div>
       </Card>
 
-      {/* Activity Log */}
       <Card>
         <SectionHeader title="Account Activity" sub="Last 10 actions" />
         {activity.length === 0 ? (
@@ -284,7 +279,6 @@ export default function UserDetailPage() {
         )}
       </Card>
 
-      {/* Modals */}
       <ConfirmModal
         open={banModal}
         onClose={() => setBanModal(false)}

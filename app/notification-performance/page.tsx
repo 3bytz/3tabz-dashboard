@@ -3,10 +3,6 @@ import { useEffect, useState } from 'react'
 import { api, type NotificationTypePerformance } from '@/lib/api'
 import { SectionHeader, Card, Table, Tr, Td, Select } from '@/components/ui'
 
-/**
- * Which notifications help and which are noise. "Suppressed" counts show the
- * guard-rails working (user preference, quiet hours, daily nudge cap).
- */
 export default function NotificationPerformancePage() {
   const [days, setDays] = useState('14')
   const [rows, setRows] = useState<NotificationTypePerformance[]>([])

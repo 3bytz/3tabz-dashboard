@@ -4,7 +4,7 @@ import { callApi, checkCsrf, getPending, jsonError, setSession } from '@/lib/ser
 export async function POST(req: NextRequest) {
   const bad = checkCsrf(req)
   if (bad) return jsonError(403, bad)
-  const pending = getPending()
+  const pending = await getPending()
   if (!pending || pending.kind !== 'totp') return jsonError(401, 'Your sign-in expired. Start again.')
   const { code } = await req.json().catch(() => ({ code: '' }))
   if (!/^\d{6}$/.test(String(code))) return jsonError(400, 'Enter the 6-digit code')

@@ -1,23 +1,17 @@
-/**
- * Authenticated proxy: browser → /api/admin/<path> → API /admin/<path>.
- * The admin JWT is added here from the HttpOnly cookie; the browser never sees it.
- * Only /admin/* paths with safe characters are forwarded; auth endpoints are not
- * reachable through this proxy (they have dedicated /api/session/* handlers).
- */
 import { NextRequest, NextResponse } from 'next/server'
 import { callApi, checkCsrf, clearAll, getSessionToken, jsonError } from '@/lib/server/session'
 
 export const dynamic = 'force-dynamic'
 const SEGMENT = /^[A-Za-z0-9_-]{1,64}$/
 
-async function handle(req: NextRequest, { params }: { params: { path: string[] } }) {
-  const segs = params.path ?? []
+async function handle(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  const segs = (await params).path ?? []
   if (!segs.length || !segs.every(s => SEGMENT.test(s)) || segs[0] === 'auth') return jsonError(404, 'Not found')
   if (req.method !== 'GET') {
     const bad = checkCsrf(req)
     if (bad) return jsonError(403, bad)
   }
-  const token = getSessionToken()
+  const token = await getSessionToken()
   if (!token) return jsonError(401, 'Not signed in')
 
   const qs = req.nextUrl.search

@@ -48,11 +48,12 @@ export default function SettingsPage() {
   const [revokeTarget, setRevokeTarget] = useState<AdminUser | null>(null)
   const [newIp,        setNewIp]        = useState('')
 
-  // Local mutable copies
   const [flags,  setFlags]  = useState<AppSettings['flags'] | null>(null)
   const [limits, setLimits] = useState<AppSettings['broadcastLimits'] | null>(null)
   const [ip,     setIp]     = useState<AppSettings['ipAllowlist'] | null>(null)
   const [crons,  setCrons]  = useState<AppSettings['cronJobs'] | null>(null)
+  const [storefronts, setStorefronts] = useState('')
+  const [savingBilling, setSavingBilling] = useState(false)
 
   const load = useCallback(async () => {
     setFetchError(''); setLoading(true)
@@ -63,6 +64,7 @@ export default function SettingsPage() {
       setLimits(s.broadcastLimits)
       setIp(s.ipAllowlist)
       setCrons(s.cronJobs)
+      setStorefronts((s.billing?.webCheckoutStorefronts ?? []).join(', '))
       setAdmins(a)
     } catch (e: any) {
       setFetchError(e?.message ?? 'Failed to load settings')
@@ -81,7 +83,7 @@ export default function SettingsPage() {
       success('Feature flags saved')
     } catch (e: any) {
       toastError(e?.message ?? 'Failed to save flags')
-      setFlags(settings!.flags) // rollback
+      setFlags(settings!.flags)
     } finally {
       setSavingFlags(false)
     }
@@ -117,6 +119,22 @@ export default function SettingsPage() {
       toastError(e?.message ?? 'Failed to save IP list')
     } finally {
       setSavingIp(false)
+    }
+  }
+
+  const saveBilling = async () => {
+    const list = storefronts.split(/[\s,]+/).map(x => x.trim()).filter(Boolean)
+      .map(x => x.replace(/^(ios|android):/i, m => m.toLowerCase()).replace(/[a-z]{3}$/i, m => m.toUpperCase()))
+    const bad = list.filter(x => !/^((ios|android):)?[A-Z]{3}$/.test(x))
+    if (bad.length) { toastError(`Not a valid storefront code: ${bad.join(', ')}`); return }
+    setSavingBilling(true)
+    try {
+      await api.updateBillingSettings({ webCheckoutStorefronts: list })
+      success(list.length ? 'Web checkout link enabled for the listed storefronts' : 'Web checkout link hidden in the app everywhere')
+    } catch (e: any) {
+      toastError(e?.message ?? 'Failed to save billing settings')
+    } finally {
+      setSavingBilling(false)
     }
   }
 
@@ -179,7 +197,6 @@ export default function SettingsPage() {
   return (
     <div className="max-w-[860px] space-y-5">
 
-      {/* Feature Flags */}
       <Card>
         <SectionHeader title="Feature Flags"
           sub="Toggle platform features globally. Changes take effect immediately."
@@ -215,7 +232,6 @@ export default function SettingsPage() {
         )}
       </Card>
 
-      {/* Broadcast Limits */}
       <Card>
         <SectionHeader title="Broadcast Limits"
           sub="Rate limiting for push notification broadcasts."
@@ -246,7 +262,19 @@ export default function SettingsPage() {
         )}
       </Card>
 
-      {/* Admin Users */}
+      <Card>
+        <SectionHeader title="Web checkout link in the app"
+          sub="Leave empty to never show a link to web checkout inside the app (safe default). Only add a storefront after confirming the store rules allow it there, e.g. ios:USA. Users who buy on the website always unlock Pro in the app by signing in, in every country." />
+        {loading ? <Skeleton className="h-10 w-full" /> : (
+          <div className="space-y-3">
+            <Input value={storefronts} onChange={setStorefronts} className="w-full" placeholder="ios:USA, android:USA" />
+            <Button variant="primary" size="sm" onClick={saveBilling} disabled={savingBilling}>
+              {savingBilling ? <><Loader2 size={12} className="animate-spin" /> Saving…</> : 'Save'}
+            </Button>
+          </div>
+        )}
+      </Card>
+
       <Card>
         <SectionHeader title="Admin Users"
           sub="Manage dashboard access. All admins require TOTP 2FA."
@@ -304,7 +332,6 @@ export default function SettingsPage() {
         )}
       </Card>
 
-      {/* IP Allowlist */}
       <Card>
         <SectionHeader title="IP Allowlist"
           sub="Restrict dashboard access to specific IPs. Disabled = all IPs permitted."
@@ -345,7 +372,6 @@ export default function SettingsPage() {
         )}
       </Card>
 
-      {/* Cron Schedules */}
       <Card>
         <SectionHeader title="Cron Schedule Configuration"
           sub="Edit cron expressions and toggle individual jobs. Standard 5-field cron syntax."
@@ -377,7 +403,6 @@ export default function SettingsPage() {
         )}
       </Card>
 
-      {/* Security (read-only) */}
       <Card>
         <SectionHeader title="Security Configuration"
           sub="Current security settings — edit via environment variables."

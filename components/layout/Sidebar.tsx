@@ -34,13 +34,11 @@ export function Sidebar() {
     } catch {
       
     }
-    // Session cookie is HttpOnly and cleared by the server (/api/session/logout).
     router.replace('/login')
   }
 
   return (
     <aside className="w-60 flex-shrink-0 border-r border-white/8 flex flex-col bg-[#0d0d0d]">
-      {/* Logo */}
       <div className="px-5 py-5 border-b border-white/8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -61,7 +59,6 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-0.5">
         {nav.map(({ href, icon: Icon, label }) => {
           const active = path === href
@@ -83,7 +80,6 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
       <div className="px-3 py-4 border-t border-white/8">
         <div className="px-3 py-2 mb-1">
           <div className="text-sm text-white font-medium">Admin</div>

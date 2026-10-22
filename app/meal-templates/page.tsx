@@ -12,7 +12,6 @@ const EXAMPLE: MealTemplate[] = [{
   regions: ['south_west'], diet: ['vegetarian', 'halal_ok'], note: 'Choose unsweetened pap for blood-sugar goals.',
 }]
 
-/** Mirrors the API's MealTemplateDto so mistakes are caught before saving. */
 function validate(items: unknown): string | null {
   if (!Array.isArray(items)) return 'Must be a JSON array'
   if (items.length > 500) return 'Maximum 500 templates'

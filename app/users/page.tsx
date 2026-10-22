@@ -137,7 +137,6 @@ export default function UsersPage() {
         }
       />
 
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
         <Input placeholder="Search name or email…" value={search} onChange={setSearch} className="w-52" />
         <Select value={plan} onChange={v => setPlan(v as Plan)} options={[
@@ -206,7 +205,6 @@ export default function UsersPage() {
         </Table>
       </div>
 
-      {/* Quick-action panel */}
       {selectedUser && (
         <div className="border border-white/8 bg-[#111] p-5">
           <div className="flex items-start justify-between mb-4">

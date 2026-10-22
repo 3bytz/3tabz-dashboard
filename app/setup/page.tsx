@@ -29,7 +29,7 @@ function SetupForm() {
     try {
       await api.setupAccount(token, password)
       setDone(true)
-      setTimeout(() => router.push('/login'), 2000) // TOTP enrolment happens at first sign-in
+      setTimeout(() => router.push('/login'), 2000)
     } catch (e: any) {
       const msg = e?.message ?? ''
       if (msg.toLowerCase().includes('expired') || msg.toLowerCase().includes('invalid')) {

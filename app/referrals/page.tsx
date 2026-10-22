@@ -46,7 +46,6 @@ export default function ReferralsPage() {
         }
       />
 
-      {/* Stats strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/6 border border-white/6">
         {loading ? Array(4).fill(0).map((_,i) => <Skeleton key={i} className="h-20" />) : <>
           <StatCard label="Total referrals"    value={stats?.totalReferrals?.toLocaleString() ?? '0'}    sub="All time" />
@@ -56,7 +55,6 @@ export default function ReferralsPage() {
         </>}
       </div>
 
-      {/* How it works + funnel */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card>
           <div className="flex items-center gap-2 mb-4">
@@ -114,7 +112,6 @@ export default function ReferralsPage() {
         </Card>
       </div>
 
-      {/* Recent activity table */}
       <Card>
         <SectionHeader title="Recent Referral Activity" sub="Latest referral events across all users" />
         <Table headers={['Referrer', 'Code', 'Invitee', 'Status', 'Completed', 'Rewarded']}>

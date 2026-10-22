@@ -12,8 +12,8 @@ type Template = { id: string; name: string; title: string; body: string; type: s
 
 const SEED_TEMPLATES: Template[] = [
   { id: 't1', name: 'Weekly Reminder', title: "How's your health this week?", body: 'Check your adherence score and see your progress. Keep it up!', type: 'general' },
-  { id: 't2', name: 'Christmas', title: 'Merry Christmas from 3TABZ 🎄', body: "Wishing you a healthy and joyful holiday season. Don't forget your medications!", type: 'holiday' },
-  { id: 't3', name: 'New Year',  title: 'Happy New Year! 🎉', body: 'New year, healthier you. Track your first dose of the year with 3TABZ.', type: 'holiday' },
+  { id: 't2', name: 'Christmas', title: 'Season’s greetings from 3TABZ', body: "Wishing you a healthy and joyful holiday season. Don't forget your medications!", type: 'holiday' },
+  { id: 't3', name: 'New Year',  title: 'Happy New Year', body: 'New year, healthier you. Track your first dose of the year with 3TABZ.', type: 'holiday' },
 ]
 
 const targetLabels: Record<Target, string> = {
@@ -61,15 +61,11 @@ export default function NotificationsPage() {
 
   useEffect(() => { loadHistory() }, [loadHistory])
 
-  // Undo countdown — only fires the broadcast when countdown reaches 0
-  // after being started (not on initial mount when undoSecs is already 0)
   useEffect(() => {
     if (undoSecs <= 0) {
       if (undoRef.current) {
         clearInterval(undoRef.current)
         undoRef.current = null
-        // Only commit if countdown was actively running (ref was set)
-        // pendingBcast check ensures we don't fire on initial mount
         if (pendingBcast) {
           commitBroadcast(pendingBcast)
         }
@@ -80,7 +76,6 @@ export default function NotificationsPage() {
     return () => {
       if (undoRef.current) clearInterval(undoRef.current)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [undoSecs])
 
   async function commitBroadcast(optimistic: Broadcast) {
@@ -95,11 +90,9 @@ export default function NotificationsPage() {
         deepLink: deepLink || undefined,
         scheduledAt: schedule === 'schedule' && scheduleTime ? scheduleTime : undefined,
       })
-      // Replace optimistic entry with real one
       setHistory(h => [real, ...h.filter(b => b.id !== optimistic.id)])
       success('Broadcast sent successfully')
     } catch (e: any) {
-      // Remove optimistic entry on failure
       setHistory(h => h.filter(b => b.id !== optimistic.id))
       toastError(e?.message ?? 'Failed to send broadcast')
     }
@@ -110,7 +103,6 @@ export default function NotificationsPage() {
     setConfirm(false)
     setSending(true)
 
-    // Optimistic entry
     const optimistic: Broadcast = {
       id: `opt_${Date.now()}`,
       title, body, type, target,
@@ -139,11 +131,9 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-[1400px] grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-5">
 
-      {/* Left: Compose */}
       <div className="space-y-4">
         <SectionHeader title="Broadcast Center" sub="Send push notifications to all or targeted users" />
 
-        {/* Templates */}
         <Card>
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs text-[#737373] uppercase tracking-widest">Templates</p>
@@ -185,7 +175,6 @@ export default function NotificationsPage() {
           </div>
         </Card>
 
-        {/* Compose */}
         <Card className="space-y-4">
           <p className="text-xs text-[#737373] uppercase tracking-widest">Compose</p>
           <div className="space-y-1">
@@ -261,7 +250,6 @@ export default function NotificationsPage() {
         </Card>
       </div>
 
-      {/* Right: Preview + History */}
       <div className="space-y-4">
         <Card>
           <div className="flex items-center justify-between mb-3">
@@ -270,7 +258,7 @@ export default function NotificationsPage() {
               {(['ios', 'android'] as const).map(tab => (
                 <button key={tab} onClick={() => setPreviewTab(tab)}
                   className={`px-3 py-1 text-xs transition-colors ${previewTab === tab ? 'bg-accent text-black font-medium' : 'text-[#525252] hover:text-white'}`}>
-                  {tab === 'ios' ? '🍎 iOS' : '🤖 Android'}
+                  {tab === 'ios' ? 'iOS' : 'Android'}
                 </button>
               ))}
             </div>
@@ -319,7 +307,6 @@ export default function NotificationsPage() {
           )}
         </Card>
 
-        {/* History */}
         <Card>
           <p className="text-xs text-[#737373] uppercase tracking-widest mb-3">Broadcast History</p>
           {historyError && (
